@@ -1,0 +1,21 @@
+<script src="https://cdn.jsdelivr.net/npm/getstream/dist/js_min/getstream.js"></script>
+
+hello!
+
+<%= @token %>
+
+<script>
+  var client = stream.connect('<%= @apikey %>', null,  '<%= @appid %>');
+  var ericFeed = client.feed('user', 'eric', '<%= @token %>')
+
+  var subscription = ericFeed.subscribe(function (data) {
+    console.log(data);
+  });
+
+  console.log({subscription})
+
+  ericFeed.get({limit:5}, (data) => {
+    console.log({data});
+  });
+
+</script>
