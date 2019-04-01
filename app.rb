@@ -1,36 +1,44 @@
-require "stream"
-require "sinatra"
 
-APIKEY = ""
-SECRET = ""
-APPID = ""
+require "sinatra"
+require "sinatra/config_file"
+require "json"
+require "stream"
+
+config_file "secrets.yml"
+APIKEY = settings.apikey
+SECRET = settings.secret
+APPID = settings.appid
+LOCATION = settings.location
 
 get "/" do
-  @apikey = APIKEY
-  @secret = SECRET
-  @appid = APPID
-  client = Stream::Client.new(@apikey, @secret, @appid, { location: 'us-east' })
-  eric_feed = client.feed('user', 'eric')
-  @token = eric_feed.readonly_token
+  client = Stream::Client.new(APIKEY, SECRET, APPID, { location: LOCATION })
 
+  user_feed = client.feed('user', '7')
+  @user_token = user_feed.readonly_token
+
+  notification_feed = client.feed('notification', '7')
+  @notification_token = notification_feed.readonly_token
+
+  @apikey = APIKEY
+  @appid = APPID
   erb :"index.html"
 end
 
 get "/add_activity" do
-  @apikey = APIKEY
-  @secret = SECRET
-  @appid = APPID
-  client = Stream::Client.new(@apikey, @secret, @appid, { location: 'us-east' })
-  eric_feed = client.feed('user', 'eric')
+  client = Stream::Client.new(APIKEY, SECRET, APPID, { location: LOCATION })
+  feed = client.feed('user', '7')
 
   activity_data = {
-    actor: "eric",
-    verb: "tweet",
-    object: 1,
-    tweet: "Hello World"
+    actor: "7",
+    verb: "test",
+    object: 0,
   }
 
-  activity_response = eric_feed.add_activity(activity_data)
+  activity_response = feed.add_activity(activity_data)
 
-  ""
+  content_type :json
+
+  @apikey = APIKEY
+  @appid = APPID
+  { success: true, data: activity_response }
 end

@@ -1,10 +1,4 @@
-replace the following with your info found in https://getstream.io/dashboard/
-
-```
-APIKEY = ""
-SECRET = ""
-APPID = ""
-```
+create a configuration file called `secrets.yml` with your info found in https://getstream.io/dashboard/
 
 `bundle install`
 
