@@ -2,24 +2,39 @@
 
 hello!
 
-<p><%= @apikey %>
-<p><%= @appid %>
-<p><%= @user_token %>
-<p><%= @notification_token %>
+<div id="timer"></div>
+<p><button id="add-activity">Add activity</button>
 
 <script>
+  var interval
   var client = stream.connect('<%= @apikey %>', null,  '<%= @appid %>');
 
-  var userFeed = client.feed('user', '7', '<%= @user_token %>')
+  var userFeed = client.feed('user', '<%= @user_id %>', '<%= @user_token %>')
   var userSubscription = userFeed.subscribe(
-    () => userFeed.get().then(data => console.log(data)),
+    () => userFeed.get()
+      .then(streamData => console.log(streamData))
+      .then(() => clearInterval(interval)),
     (errors) => console.error({errors})
   );
 
-  var notificationFeed = client.feed('notification', '7', '<%= @notification_token %>')
+  var notificationFeed = client.feed('notification', '<%= @user_id %>', '<%= @notification_token %>')
   var notificationSubscription = notificationFeed.subscribe(
-    () => notificationFeed.get().then(data => console.log(data)),
+    () => notificationFeed.get().then(streamData => console.log(streamData)),
     (errors) => console.error({errors})
   );
+
+  button = document.querySelector("button#add-activity")
+  button.onclick = (e) => {
+    timer = document.querySelector("div#timer");
+    var seconds = 0
+    interval = setInterval(() => {
+      seconds++;
+      timer.innerHTML = seconds;
+    }, 1000);
+
+    fetch("/add_activity")
+      .then(r => r.json())
+      .then(json => console.log(json));
+  }
 
 </script>
