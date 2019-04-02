@@ -2,34 +2,45 @@
 
 hello!
 
-<div id="timer"></div>
+<p>user time: <span id="user-timer"></span>
+<p>notification time: <span id="notification-timer"></span>
 <p><button id="add-activity">Add activity</button>
 
 <script>
-  var interval
+  var userInterval;
+  var notificationInterval;
   var client = stream.connect('<%= @apikey %>', null,  '<%= @appid %>');
 
   var userFeed = client.feed('user', '<%= @user_id %>', '<%= @user_token %>')
   var userSubscription = userFeed.subscribe(
     () => userFeed.get()
       .then(streamData => console.log(streamData))
-      .then(() => clearInterval(interval)),
+      .then(() => clearInterval(userInterval)),
     (errors) => console.error({errors})
   );
 
   var notificationFeed = client.feed('notification', '<%= @user_id %>', '<%= @notification_token %>')
   var notificationSubscription = notificationFeed.subscribe(
-    () => notificationFeed.get().then(streamData => console.log(streamData)),
+    () => notificationFeed.get()
+      .then(streamData => console.log(streamData))
+      .then(() => clearInterval(notificationInterval)),
     (errors) => console.error({errors})
   );
 
   button = document.querySelector("button#add-activity")
   button.onclick = (e) => {
-    timer = document.querySelector("div#timer");
-    var seconds = 0
-    interval = setInterval(() => {
-      seconds++;
-      timer.innerHTML = seconds;
+    userTimer = document.querySelector("span#user-timer");
+    var userSeconds = 0
+    userInterval = setInterval(() => {
+      userSeconds++;
+      userTimer.innerHTML = userSeconds;
+    }, 1000);
+
+    notificationTimer = document.querySelector("span#notification-timer");
+    var notificationSeconds = 0
+    notificationInterval = setInterval(() => {
+      notificationSeconds++;
+      notificationTimer.innerHTML = notificationSeconds;
     }, 1000);
 
     fetch("/add_activity")
